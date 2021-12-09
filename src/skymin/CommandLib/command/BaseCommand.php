@@ -24,11 +24,11 @@ abstract class BaseCommand extends Command{
 	}
 	
 	final public function setParameter(CommandParameter $parameter, int $parameterIndex, int $overloadIndex = 0) : void{
-		$this->commandData->overloads[$overloadIndex][$parameterIndex] = $parameter;
+		$this->overloads[$overloadIndex][$parameterIndex] = $parameter;
 	}
 	
 	final public function setParameters(array $parameters, int $overloadIndex = 0) : void{
-		$this->commandData->overloads[$overloadIndex] = array_values($parameters);
+		$this->overloads[$overloadIndex] = array_values($parameters);
 	}
 	
 	final function getOverloads() : array{
