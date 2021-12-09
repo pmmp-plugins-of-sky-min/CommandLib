@@ -18,15 +18,4 @@ final class EnumFactory{
 		return $result;
 	}
 	
-	public static function arrayCreate(array $parameters, bool $optional = false) : array{
-		$result = [];
-		foreach($parameters as $name => $enum){
-			if(is_array($enum)){
-				$enumName = key($enum);
-				$result[] = self::create($name, $enumName,  $enum($enumName));
-			}
-		}
-		return $result;
-	}
-	
 }
