@@ -2,5 +2,9 @@
 build-by-default: true
 branches:
 - master
-projects: []
+projects:
+  CommandLib:
+    path: ""
+    model: virion
+    type: library
 ...
