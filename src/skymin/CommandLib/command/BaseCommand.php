@@ -5,6 +5,7 @@ namespace skymin\CommandLib\command;
 
 use pocketmine\command\Command;
 use pocketmine\lang\Translatable;
+use pocketmine\network\mcpe\protocol\types\command\CommandParameter;
 
 use skymin\CommandLib\CmdManager;
 
