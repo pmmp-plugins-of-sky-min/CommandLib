@@ -17,7 +17,9 @@ final class PacketListener implements Listener{
 			foreach($packet->commandData as $name => $commandData){
 				$cmd = Server::getInstance()->getCommandMap()->getCommand($name);
 				if($cmd instanceof BaseCommand){
-					$commandData->overloads = $cmd->getOverloads();
+					if($cmd->hasOverloads()){
+						$commandData->overloads = $cmd->getOverloads();
+					}
 				}
 			}
 		}
