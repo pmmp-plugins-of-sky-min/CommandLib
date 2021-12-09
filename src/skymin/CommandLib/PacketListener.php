@@ -14,8 +14,8 @@ final class PacketListener implements Listener{
 	public function onDataPcaketSend(DataPacketSendEvent $ev) : void{
 		foreach($ev->getPackets() as $packet){
 			if(!$packet instanceof AvailableCommandsPacket) continue;
-			foreach($packet->commandData as $name => $commandData){
-				$cmd = Server::getInstance()->getCommandMap()->getCommand($name);
+			foreach($packet->commandData as $commandData){
+				$cmd = Server::getInstance()->getCommandMap()->getCommand($commandData->name);
 				if($cmd instanceof BaseCommand){
 					$commandData->overloads = $cmd->getOverloads();
 				}
