@@ -8,16 +8,17 @@ use pocketmine\plugin\Plugin;
 
 final class CmdManager{
 	
-	private bool $registerBool= false;
+	private static bool $registerBool= false;
 	
 	public static function register(Plugin $plugin) : void{
-		if(!$this->registerBool){
-			Server::getInstance()->getPluginManager()->registerEvents(PacketListener, $plugin);
+		if(!self::$registerBool){
+			Server::getInstance()->getPluginManager()->registerEvents(new PacketListener(), $plugin);
+			self::$registerBool = true;
 		}
 	}
 	
 	public static function isRegister() : bool{
-		return $this->registerBool;
+		return self::$registerBool;
 	}
 	
 }

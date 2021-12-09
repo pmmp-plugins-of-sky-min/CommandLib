@@ -16,8 +16,8 @@ abstract class BaseCommand extends Command{
 	private array $overloads;
 	
 	public function __construct(string $name, Translatable|string $description = "", Translatable|string|null $usageMessage = null, array $aliases = [], ?array $overloads = null){
-		if(CmdManager::isRegister()){
-			throw new \LogicException('Tried creating menu before calling ' . CmdManager::class . 'register');
+		if(!CmdManager::isRegister()){
+			throw new \LogicException('Tried creating menu before calling ' . CmdManager::class . ' register');
 		}
 		if($overloads === null){
 			$overloads = [[new CommandParameter()]];

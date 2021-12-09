@@ -9,9 +9,8 @@ use pocketmine\network\mcpe\protocol\types\command\{CommandParameter, CommandEnu
 final class EnumFactory{
 	
 	public static function create(string $name, string $enumName, array $enumValues, bool $optional = false) : CommandParameter{
-		$parameter = CommandParameter::baseline($name, AvailableCommandsPacket::ARG_FLAG_ENUM | AvailableCommandsPacket::ARG_FLAG_VALID, 0, $optional);
-		$parameter->enum = new CommandEnum($enumName, $enumValues);
-		return $parameter;
+		$result = CommandParameter::enum($name, new CommandEnum($enumName, $enumValues), 0, $optional);
+		return $result;
 	}
 	
 	public static function arrayCreate(array $parameters, bool $optional = false) : array{

@@ -4,7 +4,7 @@ declare(strict_types = 1);
 namespace skymin\CommandLib;
 
 use skymin\CommandLib\command\BaseCommand ;
-
+use pocketmine\Server;
 use pocketmine\event\Listener;
 use pocketmine\event\server\DataPacketSendEvent;
 use pocketmine\network\mcpe\protocol\AvailableCommandsPacket;
