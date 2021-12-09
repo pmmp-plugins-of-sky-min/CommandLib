@@ -13,7 +13,7 @@ use function array_values;
 
 abstract class BaseCommand extends Command{
 	
-	public function __construct(string $name, Translatable|string $description = '', Translatable|string|null $usageMessage = null, array $aliases = [], private array $overloads = [[new CommandParameter()]]){
+	public function __construct(string $name, Translatable|string $description = "", Translatable|string|null $usageMessage = null, array $aliases = [], private array $overloads = [[new CommandParameter()]]){
 		if(CmdManager::isRegister()){
 			throw new \LogicException('Tried creating menu before calling ' . CmdManager::class . 'register');
 		}
