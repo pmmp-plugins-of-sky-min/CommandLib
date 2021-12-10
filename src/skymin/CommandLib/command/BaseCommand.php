@@ -54,14 +54,14 @@ abstract class BaseCommand extends Command{
 		$this->overloads[$overloadIndex] = array_values($parameters);
 	}
 	
-	final function hasOverloads() : bool{
+	final public function hasOverloads() : bool{
 		if($this->overloads === []){
 			return false;
 		}
 		return true;
 	}
 	
-	final function getOverloads() : array{
+	final public function getOverloads() : array{
 		return $this->overloads;
 	}
 	
