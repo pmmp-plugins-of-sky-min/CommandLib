@@ -22,7 +22,7 @@
  */
 
 declare(strict_types = 1);
-
+	
 namespace skymin\CommandLib;
 
 use pocketmine\Server;
@@ -41,6 +41,12 @@ final class CmdManager{
 	
 	public static function isRegister() : bool{
 		return self::$registerBool;
+	}
+	
+	public function update() : void{
+		foreach(Server::getInstance()->getOnlinePlayers() as $player){
+			$player->getNetworkSession()->syncAvailableCommands();
+		}
 	}
 	
 }
