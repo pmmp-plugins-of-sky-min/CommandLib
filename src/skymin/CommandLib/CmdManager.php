@@ -43,7 +43,7 @@ final class CmdManager{
 		return self::$registerBool;
 	}
 	
-	public function update() : void{
+	public static function update() : void{
 		foreach(Server::getInstance()->getOnlinePlayers() as $player){
 			$player->getNetworkSession()->syncAvailableCommands();
 		}
