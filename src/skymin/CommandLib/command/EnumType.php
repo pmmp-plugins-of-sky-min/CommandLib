@@ -35,7 +35,7 @@ use pocketmine\network\mcpe\protocol\AvailableCommandsPacket as Type;
  * @method static self TARGET()
  * @method static self POSITION()
  * @method static self MESSAGE()
- * @method static swlf JSON()
+ * @method static self JSON()
  */
 final class EnumType{
 	use EnumTrait{
