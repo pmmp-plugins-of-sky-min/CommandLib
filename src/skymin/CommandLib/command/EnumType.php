@@ -28,14 +28,14 @@ namespace skymin\CommandLib\command;
 use pocketmine\utils\EnumTrait;
 use pocketmine\network\mcpe\protocol\AvailableCommandsPacket as Type;
 
-use function array_map;
-
 /**
  * @method static self INT()
  * @method static self FLOAT()
  * @method static self STRING()
  * @method static self TARGET()
  * @method static self POSITION()
+ * @method static self MESSAGE()
+ * @method static swlf JSON()
  */
 final class EnumType{
 	use EnumTrait{
@@ -48,7 +48,9 @@ final class EnumType{
 			new self('float', Type::ARG_TYPE_FLOAT),
 			new self('string', Type::ARG_TYPE_STRING),
 			new self('target', Type::ARG_TYPE_POSITION),
-			new self('position', Type::ARG_TYPE_TARGET)
+			new self('position', Type::ARG_TYPE_TARGET),
+			new self('message',  Type::ARG_TYPE_MESSAGE),
+			new self('json', Type::ARG_TYPE_JSON)
 		);
 	}
 	
