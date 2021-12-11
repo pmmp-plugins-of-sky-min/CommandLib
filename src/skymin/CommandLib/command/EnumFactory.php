@@ -30,15 +30,18 @@ use pocketmine\network\mcpe\protocol\types\command\{CommandParameter, CommandEnu
 
 final class EnumFactory{
 	
-	public static function create(string $name, string|EnumType $enumType, array $enumValues = [], bool $optional = false) : CommandParameter{
+	public static function create(string $name, string|EnumType $enumType, ?array $enumValues = null, bool $optional = false) : CommandParameter{
 		$result = new CommandParameter();
 		$result->paramName = $name;
 		$result->flags = 0;
 		$result->isOptional = $optional;
 		$result->paramType = AvailableCommandsPacket::ARG_FLAG_VALID;
 		if($enumType instanceof EnumType){
-			$result->paramType |= $enumType->getParamType();
-			return $result;
+			if($enumValues === null){
+				$result->paramType |= $enumType->getParamType();
+				return $result;
+			}
+			$enumType = $enumType->name();
 		}
 		$result->paramType |= AvailableCommandsPacket::ARG_FLAG_ENUM;
 		$result->enum = new CommandEnum($enumType, $enumValues) ;
