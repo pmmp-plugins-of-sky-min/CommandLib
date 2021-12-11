@@ -26,6 +26,7 @@ declare(strict_types = 1);
 namespace skymin\CommandLib;
 
 use pocketmine\Server;
+use pocketmine\player\Player;
 use pocketmine\plugin\Plugin;
 
 final class CmdManager{
@@ -43,7 +44,11 @@ final class CmdManager{
 		return self::$registerBool;
 	}
 	
-	public static function update() : void{
+	public function update(Player $player) : void{
+		$player->getNetworkSession()->syncAvailableCommands();
+	}
+	
+	public static function updateAll() : void{
 		foreach(Server::getInstance()->getOnlinePlayers() as $player){
 			$player->getNetworkSession()->syncAvailableCommands();
 		}
