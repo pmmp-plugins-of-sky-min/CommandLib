@@ -35,7 +35,17 @@ final class CmdManager{
 	
 	public static function register(Plugin $plugin) : void{
 		if(!self::$registerBool){
-			Server::getInstance()->getPluginManager()->registerEvents(new PacketListener(), $plugin);
+			Server::getInstance()->getPluginManager()->registerEvent(DataPacketSendEvent::class, function(DataPacketSendEvent $ev) : void{
+				foreach($ev->getPackets() as $packet){
+					if(!$packet instanceof AvailableCommandsPacket) continue;
+					foreach($packet->commandData as $name => $commandData){
+						$cmd = Server::getInstance()->getCommandMap()->getCommand($name);
+						if($cmd instanceof BaseCommand && $cmd->hasOverloads()){
+							$commandData->overloads = $cmd->getOverloads();
+						}
+					}
+				}
+			}, EventPriority::MONITOR, $plugin);
 			self::$registerBool = true;
 		}
 	}
