@@ -23,7 +23,7 @@
 
 declare(strict_types = 1);
 
-namespace skymin\CommandLib\command;
+namespace skymin\CommandLib;
 
 use pocketmine\network\mcpe\protocol\AvailableCommandsPacket;
 use pocketmine\network\mcpe\protocol\types\command\{CommandParameter, CommandEnum};

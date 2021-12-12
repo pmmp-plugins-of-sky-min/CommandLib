@@ -23,13 +23,11 @@
  
 declare(strict_types = 1);
 
-namespace skymin\CommandLib\command;
+namespace skymin\CommandLib;
 
 use pocketmine\command\Command;
 use pocketmine\lang\Translatable;
 use pocketmine\network\mcpe\protocol\types\command\CommandParameter;
-
-use skymin\CommandLib\CmdManager;
 
 use function array_values;
 

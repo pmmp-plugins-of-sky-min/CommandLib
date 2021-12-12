@@ -23,7 +23,7 @@
 
 declare(strict_types = 1);
 
-namespace skymin\CommandLib\command;
+namespace skymin\CommandLib;
 
 use pocketmine\utils\EnumTrait;
 use pocketmine\network\mcpe\protocol\AvailableCommandsPacket as Type;
