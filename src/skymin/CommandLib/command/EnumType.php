@@ -47,8 +47,8 @@ final class EnumType{
 			new self('int', Type::ARG_TYPE_INT),
 			new self('float', Type::ARG_TYPE_FLOAT),
 			new self('string', Type::ARG_TYPE_STRING),
-			new self('target', Type::ARG_TYPE_POSITION),
-			new self('position', Type::ARG_TYPE_TARGET),
+			new self('position', Type::ARG_TYPE_POSITION),
+			new self('target', Type::ARG_TYPE_TARGET),
 			new self('message',  Type::ARG_TYPE_MESSAGE),
 			new self('json', Type::ARG_TYPE_JSON)
 		);
