@@ -28,6 +28,9 @@ namespace skymin\CommandLib;
 use pocketmine\Server;
 use pocketmine\player\Player;
 use pocketmine\plugin\Plugin;
+use pocketmine\event\EventPriority;
+use pocketmine\event\server\DataPacketSendEvent;
+use pocketmine\network\mcpe\protocol\AvailableCommandsPacket;
 
 final class CmdManager{
 	
