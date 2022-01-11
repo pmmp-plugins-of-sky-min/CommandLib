@@ -25,13 +25,18 @@ declare(strict_types = 1);
 
 namespace skymin\CommandLib;
 
+use pocketmine\player\Player;
 use pocketmine\command\Command;
 use pocketmine\lang\Translatable;
+use pocketmine\permission\PermissionManager;
 use pocketmine\network\mcpe\protocol\types\command\CommandParameter;
 
+use function explode;
 use function array_values;
 
 abstract class BaseCommand extends Command{
+	
+	private array $overPermission = [];
 	
 	public function __construct(string $name, Translatable|string $description = "", Translatable|string|null $usageMessage = null, array $aliases = [], private array $overloads = []){
 		if(!CmdManager::isRegister()){
@@ -59,8 +64,28 @@ abstract class BaseCommand extends Command{
 		return true;
 	}
 	
-	final public function getOverloads() : array{
-		return $this->overloads;
+	final public function getOverloads(Player $player) : array{
+		$overloads = $this->overloads;
+		foreach($this->overPermission as $key => $value){
+			if(!isset($overloads[$key])) continue;
+			if(!$player->hasPermission($value)){
+				unset($overloads[$key]);
+			}
+		}
+		return $overloads;
+	}
+	
+	final public function setOverloadPermission(int $overloadIndex, string $permission) : void{
+		foreach(explode(';', $permission) as $perm){
+			if(PermissionManager::getInstance()->getPermission($perm) === null){
+				throw new \InvalidArgumentException("Cannot use non-existing permission \"$perm\"");
+			}
+		}
+		$this->overPermission[$overloadIndex] = $permission;
+	}
+	
+	final public function getOverloadPermission(int $overloadIndex) : ?string{
+		return $this->overPermission[$overloadIndex] ?? null;
 	}
 	
 }

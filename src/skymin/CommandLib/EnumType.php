@@ -36,6 +36,8 @@ use pocketmine\network\mcpe\protocol\AvailableCommandsPacket as Type;
  * @method static self POSITION()
  * @method static self MESSAGE()
  * @method static self JSON()
+ * @method static self FILE()
+ * @method staric self XP()
  */
 final class EnumType{
 	use EnumTrait{
@@ -50,7 +52,9 @@ final class EnumType{
 			new self('position', Type::ARG_TYPE_POSITION),
 			new self('target', Type::ARG_TYPE_TARGET),
 			new self('message',  Type::ARG_TYPE_MESSAGE),
-			new self('json', Type::ARG_TYPE_JSON)
+			new self('json', Type::ARG_TYPE_JSON),
+			new self('file', Type::ARG_TYPE_FILEPATH),
+			new self('xp', Type::ARG_FLAG_POSTFIX)
 		);
 	}
 	
