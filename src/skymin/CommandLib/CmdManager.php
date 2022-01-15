@@ -60,7 +60,7 @@ final class CmdManager{
 		return self::$registerBool;
 	}
 	
-	public function update(Player $player) : void{
+	public static function update(Player $player) : void{
 		$player->getNetworkSession()->syncAvailableCommands();
 	}
 	
