@@ -26,34 +26,37 @@ declare(strict_types = 1);
 namespace skymin\CommandLib;
 
 use pocketmine\Server;
-use pocketmine\player\Player;
-use pocketmine\plugin\Plugin;
 use pocketmine\event\EventPriority;
 use pocketmine\event\server\DataPacketSendEvent;
 use pocketmine\network\mcpe\protocol\AvailableCommandsPacket;
+use pocketmine\player\Player;
+use pocketmine\plugin\Plugin;
 
 final class CmdManager{
 	
 	private static bool $registerBool= false;
 	
 	public static function register(Plugin $plugin) : void{
-		if(!self::$registerBool){
-			Server::getInstance()->getPluginManager()->registerEvent(DataPacketSendEvent::class, function(DataPacketSendEvent $ev) : void{
-				foreach ($ev->getTargets() as $target){
-					$player = $target->getPlayer();
-					foreach($ev->getPackets() as $packet){
-						if(!$packet instanceof AvailableCommandsPacket) continue;
-						foreach($packet->commandData as $name => $commandData){
-							$cmd = Server::getInstance()->getCommandMap()->getCommand($name);
-							if($cmd instanceof BaseCommand && $cmd->hasOverloads()){
-								$commandData->overloads = $cmd->getOverloads($player);
-							}
+		if (self::$registerBool) {
+			return;
+		}
+		Server::getInstance()->getPluginManager()->registerEvent(DataPacketSendEvent::class, function(DataPacketSendEvent $ev) : void{
+			foreach ($ev->getTargets() as $target) {
+				$player = $target->getPlayer();
+				foreach ($ev->getPackets() as $packet) {
+					if (!$packet instanceof AvailableCommandsPacket) {
+						continue;
+					}
+					foreach ($packet->commandData as $name => $commandData) {
+						$cmd = Server::getInstance()->getCommandMap()->getCommand($name);
+						if ($cmd instanceof BaseCommand && $cmd->hasOverloads()) {
+							$commandData->overloads = $cmd->getOverloads($player);
 						}
 					}
 				}
-			}, EventPriority::MONITOR, $plugin);
-			self::$registerBool = true;
-		}
+			}
+		}, EventPriority::MONITOR, $plugin);
+		self::$registerBool = true;
 	}
 	
 	public static function isRegister() : bool{
