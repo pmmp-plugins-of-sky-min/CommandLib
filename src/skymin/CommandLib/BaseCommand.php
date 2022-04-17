@@ -25,11 +25,11 @@ declare(strict_types = 1);
 
 namespace skymin\CommandLib;
 
-use pocketmine\player\Player;
 use pocketmine\command\Command;
 use pocketmine\lang\Translatable;
-use pocketmine\permission\PermissionManager;
 use pocketmine\network\mcpe\protocol\types\command\CommandParameter;
+use pocketmine\permission\PermissionManager;
+use pocketmine\player\Player;
 
 use function explode;
 use function array_values;
@@ -58,16 +58,15 @@ abstract class BaseCommand extends Command{
 	}
 	
 	final public function hasOverloads() : bool{
-		if($this->overloads === []){
-			return false;
-		}
-		return true;
+		return $this->overloads !== [];
 	}
 	
 	final public function getOverloads(Player $player) : array{
 		$overloads = $this->overloads;
 		foreach($this->overPermission as $key => $value){
-			if(!isset($overloads[$key])) continue;
+			if(!isset($overloads[$key])) {
+				continue;
+			}
 			if(!$player->hasPermission($value)){
 				unset($overloads[$key]);
 			}

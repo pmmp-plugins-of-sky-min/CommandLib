@@ -25,8 +25,8 @@ declare(strict_types = 1);
 
 namespace skymin\CommandLib;
 
-use pocketmine\utils\EnumTrait;
 use pocketmine\network\mcpe\protocol\AvailableCommandsPacket as Type;
+use pocketmine\utils\EnumTrait;
 
 /**
  * @method static self INT()
@@ -37,7 +37,7 @@ use pocketmine\network\mcpe\protocol\AvailableCommandsPacket as Type;
  * @method static self MESSAGE()
  * @method static self JSON()
  * @method static self FILE()
- * @method staric self XP()
+ * @method static self XP()
  */
 final class EnumType{
 	use EnumTrait{
