@@ -32,45 +32,73 @@ use pocketmine\network\mcpe\protocol\AvailableCommandsPacket;
 use pocketmine\player\Player;
 use pocketmine\plugin\Plugin;
 
+use function spl_object_id;
+
 final class CmdManager{
-	
+
 	private static bool $registerBool= false;
-	
+
+	/** @var true[] */
+	private static array $pks = [];
+
 	public static function register(Plugin $plugin) : void{
 		if (self::$registerBool) {
 			return;
 		}
-		Server::getInstance()->getPluginManager()->registerEvent(DataPacketSendEvent::class, function(DataPacketSendEvent $ev) : void{
-			foreach ($ev->getTargets() as $target) {
-				$player = $target->getPlayer();
-				foreach ($ev->getPackets() as $packet) {
-					if (!$packet instanceof AvailableCommandsPacket) {
-						continue;
+		Server::getInstance()->getPluginManager()->registerEvent(DataPacketSendEvent::class, static function(DataPacketSendEvent $ev) : void{
+			foreach ($ev->getPackets() as $packet) {
+				if ($packet instanceof AvailableCommandsPacket) {
+					$id = spl_object_id($packet);
+					if (isset(self::$pks[$id])) {
+						unset(self::$pks[$id]);
+					} else {
+						self::generateOverloads($ev->getTargets(), $packet);
 					}
-					foreach ($packet->commandData as $name => $commandData) {
-						$cmd = Server::getInstance()->getCommandMap()->getCommand($name);
-						if ($cmd instanceof BaseCommand && $cmd->hasOverloads()) {
-							$commandData->overloads = $cmd->getOverloads($player);
-						}
-					}
+					break;
 				}
 			}
 		}, EventPriority::MONITOR, $plugin);
 		self::$registerBool = true;
 	}
-	
+
+	private static function generateOverloads(array $targets, AvailableCommandsPacket &$packet) : void{
+		if (count($targets) === 1) {
+			[$target] = $targets;
+			$player = $target->getPlayer();
+			foreach ($packet->commandData as $name => $commandData) {
+				$cmd = Server::getInstance()->getCommandMap()->getCommand($name);
+				if ($cmd instanceof BaseCommand && $cmd->hasOverloads()) {
+					$commandData->overloads = $cmd->getOverloads($player);
+				}
+			}
+		} else {
+			foreach ($targets as $target) {
+				$player = $target->getPlayer();
+				$pk = clone $packet;
+				foreach ($pk->commandData as $name => $commandData) {
+					$cmd = Server::getInstance()->getCommandMap()->getCommand($name);
+					if ($cmd instanceof BaseCommand && $cmd->hasOverloads()) {
+						$commandData->overloads = $cmd->getOverloads($player);
+					}
+				}
+				self::$pks[spl_object_id($pk)] = true;
+				$target->sendDataPacket($pk);
+			}
+		}
+	}
+
 	public static function isRegister() : bool{
 		return self::$registerBool;
 	}
-	
+
 	public static function update(Player $player) : void{
 		$player->getNetworkSession()->syncAvailableCommands();
 	}
-	
+
 	public static function updateAll() : void{
 		foreach(Server::getInstance()->getOnlinePlayers() as $player){
 			$player->getNetworkSession()->syncAvailableCommands();
 		}
 	}
-	
+
 }

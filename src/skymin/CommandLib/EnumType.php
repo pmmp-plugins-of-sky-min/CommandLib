@@ -45,11 +45,12 @@ use pocketmine\utils\EnumTrait;
  * @method static self JSON()
  * @method static self COMMAND()
  */
+
 final class EnumType{
 	use EnumTrait{
 		__construct as Enum__construct;
 	}
-	
+
 	protected static function setup() : void{
 		self::registerAll(
 			new self('int', Type::ARG_TYPE_INT),
@@ -70,13 +71,13 @@ final class EnumType{
 			new self('command', Type::ARG_TYPE_COMMAND)
 		);
 	}
-	
+
 	private function __construct(string $name, private int $paramType){
 		$this->Enum__construct($name);
 	}
-	
+
 	public function getParamType() : int{
 		return $this->paramType;
 	}
-	
+
 }
