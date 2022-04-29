@@ -29,7 +29,9 @@ use pocketmine\Server;
 use pocketmine\event\EventPriority;
 use pocketmine\event\server\DataPacketSendEvent;
 use pocketmine\network\mcpe\protocol\AvailableCommandsPacket;
+use pocketmine\network\mcpe\protocol\types\command\{CommandData, CommandEnum};
 use pocketmine\player\Player;
+use pocketmine\lang\Translatable;
 use pocketmine\plugin\Plugin;
 
 use function spl_object_id;
@@ -79,6 +81,8 @@ final class CmdManager{
 					$cmd = Server::getInstance()->getCommandMap()->getCommand($name);
 					if ($cmd instanceof BaseCommand && $cmd->hasOverloads()) {
 						$commandData->overloads = $cmd->getOverloads($player);
+					} else {
+						unset($pk->commandData[$name]);
 					}
 				}
 				self::$pks[spl_object_id($pk)] = true;
@@ -91,13 +95,30 @@ final class CmdManager{
 		return self::$registerBool;
 	}
 
-	public static function update(Player $player) : void{
-		$player->getNetworkSession()->syncAvailableCommands();
-	}
-
-	public static function updateAll() : void{
-		foreach(Server::getInstance()->getOnlinePlayers() as $player){
-			$player->getNetworkSession()->syncAvailableCommands();
+	public static function update(BaseCommand $command) : void{
+		$name = $command->getName();
+		$lname = strtolower($name);
+		$aliases = $command->getAliases();
+		$aliasObj = null;
+		if (count($aliases) > 0) {
+			if (!in_array($lname, $aliases, true)) {
+				$aliases[] = $lname;
+			}
+			$aliasObj = new CommandEnum(ucfirst($name) . 'Aliases', array_values($aliases));
+		}
+		$description = $command->getDescription();
+		foreach (Server::getInstance()->getOnlinePlayers() as $player) {
+			$pk = new AvailableCommandsPacket();
+			$pk->commandData = [new CommandData(
+				$lname,
+				$description instanceof Translatable ? $player->getLanguage()->translate($description) : $description,
+				0,
+				0,
+				$aliasObj,
+				$command->getOverloads($player)
+			)];
+			self::$pks[spl_object_id($pk)] = true;
+			$player->getNetworkSession()->sendDataPacket($pk);
 		}
 	}
 
