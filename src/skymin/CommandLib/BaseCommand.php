@@ -27,7 +27,6 @@ namespace skymin\CommandLib;
 
 use pocketmine\command\Command;
 use pocketmine\lang\Translatable;
-use pocketmine\network\mcpe\protocol\types\command\CommandParameter;
 use pocketmine\permission\PermissionManager;
 use pocketmine\player\Player;
 
@@ -36,45 +35,52 @@ use function array_values;
 
 abstract class BaseCommand extends Command{
 
+	/** @var string[][] */
 	private array $overPermission = [];
 
-	public function __construct(string $name, Translatable|string $description = "", Translatable|string|null $usageMessage = null, array $aliases = [], private array $overloads = []){
+	/** @var Parameter[][] */
+	private array $overloads = []
+
+	public function __construct(string $name, Translatable|string $description = "", Translatable|string|null $usageMessage = null, array $aliases = []){
 		if(!CmdManager::isRegister()){
 			throw new \LogicException('Tried creating menu before calling ' . CmdManager::class . ' register');
 		}
 		parent::__construct($name, $description, $usageMessage, $aliases);
 	}
 
-	final public function addParameter(CommandParameter $parameter, int $overloadIndex = 0) : void{
+	public final function addParameter(Parameter $parameter, int $overloadIndex) : void{
 		$this->overloads[$overloadIndex][] = $parameter;
 	}
 
-	final public function setParameter(CommandParameter $parameter, int $parameterIndex, int $overloadIndex = 0) : void{
+	public final function setParameter(Parameter $parameter, int $parameterIndex, int $overloadIndex) : void{
 		$this->overloads[$overloadIndex][$parameterIndex] = $parameter;
 	}
 
-	final public function setParameters(array $parameters, int $overloadIndex = 0) : void{
+	public final function getParameter(int $parameterIndex, int $overloadIndex) : ?Parameter{
+		return $this->overloads[$overloadIndex][$parameterIndex] ?? null;
+	}
+
+	/** @param Parameter[] $parameters */
+	public final function addOverload(array $parameters) : void{
+		$this->overloads[] = array_values($parameters);
+	}
+
+	/** @param Parameter[] $parameters */
+	public final function setOverload(array $parameters, int $overloadIndex) : void{
 		$this->overloads[$overloadIndex] = array_values($parameters);
 	}
 
-	final public function hasOverloads() : bool{
-		return $this->overloads !== [];
+	/** @return Parameter[] */
+	public final function getOverload(int $overloadIndex) : ?array{
+		return $this->overloads[$overloadIndex] ?? null;
 	}
 
-	final public function getOverloads(Player $player) : array{
-		$overloads = $this->overloads;
-		foreach($this->overPermission as $key => $value){
-			if(!isset($overloads[$key])) {
-				continue;
-			}
-			if(!$player->hasPermission($value)){
-				unset($overloads[$key]);
-			}
-		}
-		return $overloads;
+	/** @param Parameter[][] $parameters */
+	public final function setOverloads(array $overloads) : void{
+		$this->overloads = $overloads;
 	}
 
-	final public function setOverloadPermission(int $overloadIndex, string $permission) : void{
+	public final function setOverloadPermission(int $overloadIndex, string $permission) : void{
 		foreach(explode(';', $permission) as $perm){
 			if(PermissionManager::getInstance()->getPermission($perm) === null){
 				throw new \InvalidArgumentException("Cannot use non-existing permission \"$perm\"");
@@ -85,6 +91,20 @@ abstract class BaseCommand extends Command{
 
 	final public function getOverloadPermission(int $overloadIndex) : ?string{
 		return $this->overPermission[$overloadIndex] ?? null;
+	}
+
+	public final function encode(Player $player) : array{
+		$encode = [];
+		$overPermission = $this->overPermission;
+		foreach ($this->overloads as $overKey => $overload) {
+			if (isset($overPermission[$overKey]) && !$player->hasPermission($overPermission[$overKey])) {
+				continue;
+			}
+			foreach ($overload as $paramKey => $parameter){
+				$encode[$overKey][$paramKey] = $parameter->encode();
+			}
+		}
+		return $encode;
 	}
 
 }

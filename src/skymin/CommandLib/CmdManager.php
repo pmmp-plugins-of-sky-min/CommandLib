@@ -51,40 +51,20 @@ final class CmdManager{
 					$id = spl_object_id($packet);
 					if (isset(self::$pks[$id])) {
 						unset(self::$pks[$id]);
-					} else {
-						self::generateOverloads($ev->getTargets(), $packet);
+						return;
 					}
-					break;
+					$target = $ev->getTargets()[0];
+					$player = $target->getPlayer();
+					foreach ($packet->commandData as $name => $commandData) {
+						$cmd = Server::getInstance()->getCommandMap()->getCommand($name);
+						if ($cmd instanceof BaseCommand && $cmd->hasOverloads()) {
+							$commandData->overloads = $cmd->encode($player);
+						}
+					}
 				}
 			}
 		}, EventPriority::MONITOR, $plugin);
 		self::$registerBool = true;
-	}
-
-	private static function generateOverloads(array $targets, AvailableCommandsPacket &$packet) : void{
-		if (count($targets) === 1) {
-			[$target] = $targets;
-			$player = $target->getPlayer();
-			foreach ($packet->commandData as $name => $commandData) {
-				$cmd = Server::getInstance()->getCommandMap()->getCommand($name);
-				if ($cmd instanceof BaseCommand && $cmd->hasOverloads()) {
-					$commandData->overloads = $cmd->getOverloads($player);
-				}
-			}
-		} else {
-			foreach ($targets as $target) {
-				$player = $target->getPlayer();
-				$pk = clone $packet;
-				foreach ($pk->commandData as $name => $commandData) {
-					$cmd = Server::getInstance()->getCommandMap()->getCommand($name);
-					if ($cmd instanceof BaseCommand && $cmd->hasOverloads()) {
-						$commandData->overloads = $cmd->getOverloads($player);
-					}
-				}
-				self::$pks[spl_object_id($pk)] = true;
-				$target->sendDataPacket($pk);
-			}
-		}
 	}
 
 	public static function isRegister() : bool{
@@ -93,12 +73,6 @@ final class CmdManager{
 
 	public static function update(Player $player) : void{
 		$player->getNetworkSession()->syncAvailableCommands();
-	}
-
-	public static function updateAll() : void{
-		foreach(Server::getInstance()->getOnlinePlayers() as $player){
-			$player->getNetworkSession()->syncAvailableCommands();
-		}
 	}
 
 }
