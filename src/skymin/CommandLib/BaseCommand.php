@@ -39,7 +39,7 @@ abstract class BaseCommand extends Command{
 	private array $overPermission = [];
 
 	/** @var Parameter[][] */
-	private array $overloads = []
+	private array $overloads = [];
 
 	public function __construct(string $name, Translatable|string $description = "", Translatable|string|null $usageMessage = null, array $aliases = []){
 		if(!CmdManager::isRegister()){
@@ -93,6 +93,10 @@ abstract class BaseCommand extends Command{
 		return $this->overPermission[$overloadIndex] ?? null;
 	}
 
+	public final function hasOverloads() : bool{
+		return $this->overloads !== [];
+	}
+
 	public final function encode(Player $player) : array{
 		$encode = [];
 		$overPermission = $this->overPermission;
@@ -101,7 +105,7 @@ abstract class BaseCommand extends Command{
 				continue;
 			}
 			foreach ($overload as $paramKey => $parameter){
-				$encode[$overKey][$paramKey] = $parameter->encode();
+				$encode[$overKey][$paramKey] = $parameter->encode($player);
 			}
 		}
 		return $encode;

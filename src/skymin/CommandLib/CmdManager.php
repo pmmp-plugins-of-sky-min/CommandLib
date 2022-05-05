@@ -57,7 +57,7 @@ final class CmdManager{
 						unset(self::$pks[$id]);
 						return;
 					}
-					foreach ($targets as $target) {
+					foreach ($ev->getTargets() as $target) {
 						$player = $target->getPlayer();
 						$pk = clone $packet;
 						foreach ($pk->commandData as $name => $commandData) {
@@ -75,8 +75,8 @@ final class CmdManager{
 			}
 		}, EventPriority::MONITOR, $plugin);
 		$manager->registerEvent(PlayerQuitEvent::class, static function(PlayerQuitEvent $ev) : void{
-			$id = spl_object_id($ev->getPlayer);
-			if (isset(self::$playerdata[$id]) {
+			$id = spl_object_id($ev->getPlayer());
+			if (isset(self::$playerdata[$id])) {
 				unset(self::$playerdata[$id]);
 			}
 		}, EventPriority::MONITOR, $plugin);
@@ -91,17 +91,18 @@ final class CmdManager{
 		if (!$command->isRegistered()) {
 			return;
 		}
+		$name = $command->getName();
 		foreach(Server::getInstance()->getOnlinePlayers() as $player){
 			$id = spl_object_id($player);
-			if(isset(self::$playerdata[$id])){
+			if (isset(self::$playerdata[$id])) {
 				$commandData = self::$playerdata[$id];
 				$commandData[$name]->overloads = $command->encode($player);
 				$pk = AvailableCommandsPacket::create($commandData, [], [], []);
 				self::$pks[spl_object_id($pk)] = true;
-				$target->sendDataPacket($pk);
+				$player->getNetworkSession()->sendDataPacket($pk);
 				self::$playerdata[$id] = $pk->commandData;
-			}else{
-				$player->getNetworkSession()->syncAvailableCommands()
+			} else {
+				$player->getNetworkSession()->syncAvailableCommands();
 			}
 		}
 	}
