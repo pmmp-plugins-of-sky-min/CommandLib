@@ -48,39 +48,39 @@ abstract class BaseCommand extends Command{
 		parent::__construct($name, $description, $usageMessage, $aliases);
 	}
 
-	public final function addParameter(Parameter $parameter, int $overloadIndex) : void{
+	final public function addParameter(Parameter $parameter, int $overloadIndex) : void{
 		$this->overloads[$overloadIndex][] = $parameter;
 	}
 
-	public final function setParameter(Parameter $parameter, int $parameterIndex, int $overloadIndex) : void{
+	final public function setParameter(Parameter $parameter, int $parameterIndex, int $overloadIndex) : void{
 		$this->overloads[$overloadIndex][$parameterIndex] = $parameter;
 	}
 
-	public final function getParameter(int $parameterIndex, int $overloadIndex) : ?Parameter{
+	final public function getParameter(int $parameterIndex, int $overloadIndex) : ?Parameter{
 		return $this->overloads[$overloadIndex][$parameterIndex] ?? null;
 	}
 
 	/** @param Parameter[] $parameters */
-	public final function addOverload(array $parameters) : void{
+	final public function addOverload(array $parameters) : void{
 		$this->overloads[] = array_values($parameters);
 	}
 
 	/** @param Parameter[] $parameters */
-	public final function setOverload(array $parameters, int $overloadIndex) : void{
+	final public function setOverload(array $parameters, int $overloadIndex) : void{
 		$this->overloads[$overloadIndex] = array_values($parameters);
 	}
 
 	/** @return Parameter[] */
-	public final function getOverload(int $overloadIndex) : ?array{
+	final public function getOverload(int $overloadIndex) : ?array{
 		return $this->overloads[$overloadIndex] ?? null;
 	}
 
 	/** @param Parameter[][] $parameters */
-	public final function setOverloads(array $overloads) : void{
+	final public function setOverloads(array $overloads) : void{
 		$this->overloads = $overloads;
 	}
 
-	public final function setOverloadPermission(int $overloadIndex, string $permission) : void{
+	final public function setOverloadPermission(int $overloadIndex, string $permission) : void{
 		foreach(explode(';', $permission) as $perm){
 			if(PermissionManager::getInstance()->getPermission($perm) === null){
 				throw new \InvalidArgumentException("Cannot use non-existing permission \"$perm\"");
@@ -93,11 +93,11 @@ abstract class BaseCommand extends Command{
 		return $this->overPermission[$overloadIndex] ?? null;
 	}
 
-	public final function hasOverloads() : bool{
+	final public function hasOverloads() : bool{
 		return $this->overloads !== [];
 	}
 
-	public final function encode(Player $player) : array{
+	final public function encode(Player $player) : array{
 		$encode = [];
 		$overPermission = $this->overPermission;
 		foreach ($this->overloads as $overKey => $overload) {

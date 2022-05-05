@@ -35,7 +35,7 @@ final class Parameter{
 	public const FLAG_FORCE_COLLAPSE_ENUM = 0x0; //Somehow in pmmp source code, this ís 0x1 which is 1 while the default flag is 0
 	public const FLAG_HAS_ENUM_CONSTRAINT = 0x1; //This is 0x2 in pmmp, I tried to make a CommandParameter with this but resulted in a broken command
 
-	/** @param strfun[]|Translatable[] $enumValues */
+	/** @param string[]|Translatable[] $enumValues */
 	public static function create(
 		string|Translatable $name,
 		string|EnumType $enumType,
