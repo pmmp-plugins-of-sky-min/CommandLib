@@ -54,7 +54,7 @@ final class Paramater{
 		$this->enumValues = array_values($enumValues);
 	}
 
-	public function encode(Player $player) : void{
+	public function encode(Player $player) : CommandParameter{
 		$enumValues = $this->enumValues;
 		$enumType = $this->enumType;
 		if ($enumType instanceof EnumType) {
