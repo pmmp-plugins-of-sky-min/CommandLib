@@ -40,7 +40,7 @@ final class CmdManager{
 	private static bool $registerBool= false;
 
 	/** @var true[] */
-	private static array $pks = [];
+	private static array $filter = [];
 
 	private static array $playerdata = [];
 
@@ -53,8 +53,8 @@ final class CmdManager{
 			foreach ($ev->getPackets() as $packet) {
 				if ($packet instanceof AvailableCommandsPacket) {
 					$id = spl_object_id($packet);
-					if (isset(self::$pks[$id])) {
-						unset(self::$pks[$id]);
+					if (isset(self::$filter[$id])) {
+						unset(self::$filter[$id]);
 						return;
 					}
 					foreach ($ev->getTargets() as $target) {
@@ -66,7 +66,7 @@ final class CmdManager{
 								$commandData->overloads = $cmd->encode($player);
 							}
 						}
-						self::$pks[spl_object_id($pk)] = true;
+						self::$filter[spl_object_id($pk)] = true;
 						$target->sendDataPacket($pk);
 						self::$playerdata[spl_object_id($player)] = $pk->commandData;
 					}
@@ -98,7 +98,7 @@ final class CmdManager{
 				$commandData = self::$playerdata[$id];
 				$commandData[$name]->overloads = $command->encode($player);
 				$pk = AvailableCommandsPacket::create($commandData, [], [], []);
-				self::$pks[spl_object_id($pk)] = true;
+				self::$filter[spl_object_id($pk)] = true;
 				$player->getNetworkSession()->sendDataPacket($pk);
 				self::$playerdata[$id] = $pk->commandData;
 			} else {
