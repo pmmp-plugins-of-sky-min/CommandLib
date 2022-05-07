@@ -34,7 +34,7 @@ use pocketmine\utils\EnumTrait;
  * @method static self WILDCARD_INT()
  * @method static self OPERATOR()
  * @method static self TARGET()
- * @method staric self WILDCARD_TARGE()
+ * @method static self WILDCARD_TARGE()
  * @method static self FILE()
  * @method static self SLOT()
  * @method static self STRING()
