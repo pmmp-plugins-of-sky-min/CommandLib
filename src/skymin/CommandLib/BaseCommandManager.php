@@ -36,7 +36,8 @@ use pocketmine\plugin\Plugin;
 
 use function spl_object_id;
 
-final class CmdManager{
+final class BaseCommandManager
+{
 
 	private static bool $registeredCheck = false;
 
