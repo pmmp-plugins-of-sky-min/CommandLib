@@ -1,4 +1,5 @@
 <?php
+
 /**
  *      _                    _       
  *  ___| | ___   _ _ __ ___ (_)_ __  
@@ -10,7 +11,7 @@
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the MIT License. see <https://opensource.org/licenses/MIT>.
  * 
- * @author skymin
+ * @author libs\skymin
  * @link   https://github.com/sky-min
  * @license https://opensource.org/licenses/MIT MIT License
  * 
@@ -25,6 +26,7 @@ declare(strict_types = 1);
 
 namespace skymin\CommandLib;
 
+use skymin\CommandLib\utils\Parameter;
 use pocketmine\command\Command;
 use pocketmine\lang\Translatable;
 use pocketmine\permission\PermissionManager;
@@ -42,9 +44,10 @@ abstract class BaseCommand extends Command{
 	private array $overloads = [];
 
 	public function __construct(string $name, Translatable|string $description = "", Translatable|string|null $usageMessage = null, array $aliases = []){
-		if(!CmdManager::isRegister()){
-			throw new \LogicException('Tried creating menu before calling ' . CmdManager::class . ' register');
+		if(!BaseCommandManager::isRegistered()){
+			throw new \LogicException('Tried creating command before registering ' . BaseCommandManager::class . '!');
 		}
+
 		parent::__construct($name, $description, $usageMessage, $aliases);
 	}
 
@@ -89,7 +92,8 @@ abstract class BaseCommand extends Command{
 		$this->overPermission[$overloadIndex] = $permission;
 	}
 
-	final public function getOverloadPermission(int $overloadIndex) : ?string{
+	final public function getOverloadPermission(int $overloadIndex) : ?array
+    {
 		return $this->overPermission[$overloadIndex] ?? null;
 	}
 
@@ -110,5 +114,4 @@ abstract class BaseCommand extends Command{
 		}
 		return $encode;
 	}
-
 }
