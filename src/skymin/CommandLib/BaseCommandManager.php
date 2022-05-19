@@ -1,4 +1,5 @@
 <?php
+
 /**
  *      _                    _       
  *  ___| | ___   _ _ __ ___ (_)_ __  
@@ -37,7 +38,7 @@ use function spl_object_id;
 
 final class CmdManager{
 
-	private static bool $registerBool= false;
+	private static bool $registeredCheck = false;
 
 	/** @var true[] */
 	private static array $filter = [];
@@ -45,9 +46,10 @@ final class CmdManager{
 	private static array $playerdata = [];
 
 	public static function register(Plugin $plugin) : void{
-		if (self::$registerBool) {
+		if (self::$registeredCheck) {
 			return;
 		}
+		
 		$manager = Server::getInstance()->getPluginManager();
 		$manager->registerEvent(DataPacketSendEvent::class, static function(DataPacketSendEvent $ev) : void{
 			foreach ($ev->getPackets() as $packet) {
@@ -80,17 +82,19 @@ final class CmdManager{
 				unset(self::$playerdata[$id]);
 			}
 		}, EventPriority::MONITOR, $plugin);
-		self::$registerBool = true;
+		
+		self::$registeredCheck = true;
 	}
 
-	public static function isRegister() : bool{
-		return self::$registerBool;
+	public static function isRegistered() : bool{
+		return self::$registeredCheck;
 	}
 
 	public static function update(BaseCommand $command) : void{
 		if (!$command->isRegistered()) {
 			return;
 		}
+		
 		$name = $command->getName();
 		foreach(Server::getInstance()->getOnlinePlayers() as $player){
 			$id = spl_object_id($player);
@@ -106,5 +110,4 @@ final class CmdManager{
 			}
 		}
 	}
-
 }
