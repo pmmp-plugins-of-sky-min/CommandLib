@@ -24,7 +24,7 @@
 
 declare(strict_types = 1);
 
-namespace utils\skymin\CommandLib;
+namespace skymin\CommandLib\utils;
 
 use pocketmine\player\Player;
 use pocketmine\lang\Translatable;
