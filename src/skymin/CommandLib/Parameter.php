@@ -1,4 +1,5 @@
 <?php
+
 /**
  *      _                    _       
  *  ___| | ___   _ _ __ ___ (_)_ __  
@@ -23,7 +24,7 @@
 
 declare(strict_types = 1);
 
-namespace skymin\CommandLib;
+namespace utils\skymin\CommandLib;
 
 use pocketmine\player\Player;
 use pocketmine\lang\Translatable;
@@ -82,5 +83,4 @@ final class Parameter{
 		}
 		return CommandParameter::enum($this->name, new CommandEnum($enumType, $enumValues), $this->flag, $this->optional);
 	}
-
 }
