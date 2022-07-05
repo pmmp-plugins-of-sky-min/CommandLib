@@ -23,7 +23,7 @@
 
 declare(strict_types = 1);
 
-namespace skymin\CommandLib;
+namespace skymin\CommandLib\parameter;
 
 use pocketmine\network\mcpe\protocol\AvailableCommandsPacket as Type;
 use pocketmine\utils\EnumTrait;
@@ -32,9 +32,9 @@ use pocketmine\utils\EnumTrait;
  * @method static self INT()
  * @method static self FLOAT()
  * @method static self WILDCARD_INT()
- * @method static self OPERATOR()
+ * @method static selr OPERATOR()
  * @method static self TARGET()
- * @method static self WILDCARD_TARGE()
+ * @method staric self WILDCARD_TARGE()
  * @method static self FILE()
  * @method static self SLOT()
  * @method static self STRING()
@@ -45,8 +45,7 @@ use pocketmine\utils\EnumTrait;
  * @method static self JSON()
  * @method static self COMMAND()
  */
-
-final class EnumType{
+final class ParamType{
 	use EnumTrait{
 		__construct as Enum__construct;
 	}

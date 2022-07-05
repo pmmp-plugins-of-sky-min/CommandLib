@@ -25,8 +25,11 @@ declare(strict_types = 1);
 
 namespace skymin\CommandLib;
 
+use skymin\CommandLib\parameter\Parameter;
+
 use pocketmine\command\Command;
 use pocketmine\lang\Translatable;
+use pocketmine\network\mcpe\protocol\types\command\CommandParameter;
 use pocketmine\permission\PermissionManager;
 use pocketmine\player\Player;
 
@@ -35,10 +38,16 @@ use function array_values;
 
 abstract class BaseCommand extends Command{
 
-	/** @var string[][] */
+	/**
+	 * @var string[]
+	 * @phpstan-var array<int, array<int, string>>
+	 */
 	private array $overPermission = [];
 
-	/** @var Parameter[][] */
+	/**
+	 * @var Parameter[][]
+	 * @phpstan-var array<int, array<int, string>>
+	 */
 	private array $overloads = [];
 
 	public function __construct(string $name, Translatable|string $description = "", Translatable|string|null $usageMessage = null, array $aliases = []){
@@ -48,12 +57,12 @@ abstract class BaseCommand extends Command{
 		parent::__construct($name, $description, $usageMessage, $aliases);
 	}
 
-	final public function addParameter(Parameter $parameter, int $overloadIndex) : void{
-		$this->overloads[$overloadIndex][] = $parameter;
+	final public function addParameter(Parameter $Parameter, int $overloadIndex) : void{
+		$this->overloads[$overloadIndex][] = $Parameter;
 	}
 
-	final public function setParameter(Parameter $parameter, int $parameterIndex, int $overloadIndex) : void{
-		$this->overloads[$overloadIndex][$parameterIndex] = $parameter;
+	final public function setParameter(Parameter $Parameter, int $parameterIndex, int $overloadIndex) : void{
+		$this->overloads[$overloadIndex][$parameterIndex] = $Parameter;
 	}
 
 	final public function getParameter(int $parameterIndex, int $overloadIndex) : ?Parameter{
@@ -97,15 +106,16 @@ abstract class BaseCommand extends Command{
 		return $this->overloads !== [];
 	}
 
+	/** @return CommandParameter[] */
 	final public function encode(Player $player) : array{
 		$encode = [];
 		$overPermission = $this->overPermission;
-		foreach ($this->overloads as $overKey => $overload) {
-			if (isset($overPermission[$overKey]) && !$player->hasPermission($overPermission[$overKey])) {
+		foreach($this->overloads as $overKey => $overload){
+			if(isset($overPermission[$overKey]) && !$player->hasPermission($overPermission[$overKey])){
 				continue;
 			}
-			foreach ($overload as $paramKey => $parameter){
-				$encode[$overKey][$paramKey] = $parameter->encode($player);
+			foreach($overload as $paramKey => $Parameter){
+				$encode[$overKey][$paramKey] = $Parameter->encode($player);
 			}
 		}
 		return $encode;

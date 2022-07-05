@@ -25,6 +25,8 @@ declare(strict_types = 1);
 	
 namespace skymin\CommandLib;
 
+use skymin\CommandLib\enum\EnumManager;
+
 use pocketmine\Server;
 use pocketmine\event\EventPriority;
 use pocketmine\event\player\PlayerQuitEvent;
@@ -33,78 +35,45 @@ use pocketmine\network\mcpe\protocol\AvailableCommandsPacket;
 use pocketmine\player\Player;
 use pocketmine\plugin\Plugin;
 
-use function spl_object_id;
+use function count;
+use function reset;
 
 final class CmdManager{
 
-	private static bool $registerBool= false;
-
-	/** @var true[] */
-	private static array $filter = [];
-
-	private static array $playerdata = [];
+	private static bool $registerBool = false;
 
 	public static function register(Plugin $plugin) : void{
 		if (self::$registerBool) {
 			return;
 		}
-		$manager = Server::getInstance()->getPluginManager();
-		$manager->registerEvent(DataPacketSendEvent::class, static function(DataPacketSendEvent $ev) : void{
-			foreach ($ev->getPackets() as $packet) {
-				if ($packet instanceof AvailableCommandsPacket) {
-					$id = spl_object_id($packet);
-					if (isset(self::$filter[$id])) {
-						unset(self::$filter[$id]);
-						return;
-					}
-					foreach ($ev->getTargets() as $target) {
-						$player = $target->getPlayer();
-						$pk = clone $packet;
-						foreach ($pk->commandData as $name => $commandData) {
-							$cmd = Server::getInstance()->getCommandMap()->getCommand($name);
-							if ($cmd instanceof BaseCommand && $cmd->hasOverloads()) {
-								$commandData->overloads = $cmd->encode($player);
-							}
-						}
-						self::$filter[spl_object_id($pk)] = true;
-						$target->sendDataPacket($pk);
-						self::$playerdata[spl_object_id($player)] = $pk->commandData;
-					}
-					return;
+		$server = Server::getInstance();
+		$commandMap = $server->getCommandMap();
+		$server->getPluginManager()->registerEvent(DataPacketSendEvent::class, static function(DataPacketSendEvent $ev) use($commandMap): void{
+			$packets = $ev->getPackets();
+			if(count($packets) !== 1){
+				return;
+			}
+			$packet = reset($packets);
+			if(!$packet instanceof AvailableCommandsPacket){
+				return;
+			}
+			$targets = $ev->getTargets();
+			if(count($targets) !== 1){
+				return;
+			}
+			foreach ($packet->commandData as $name => $commandData) {
+				$cmd = $commandMap->getCommand($name);
+				if($cmd instanceof BaseCommand && $cmd->hasOverloads()){
+					$commandData->overloads = $cmd->encode($player);
 				}
 			}
-		}, EventPriority::MONITOR, $plugin);
-		$manager->registerEvent(PlayerQuitEvent::class, static function(PlayerQuitEvent $ev) : void{
-			$id = spl_object_id($ev->getPlayer());
-			if (isset(self::$playerdata[$id])) {
-				unset(self::$playerdata[$id]);
-			}
+			$packet->softEnums = EnumManager::getSoftEnums();
 		}, EventPriority::MONITOR, $plugin);
 		self::$registerBool = true;
 	}
 
 	public static function isRegister() : bool{
 		return self::$registerBool;
-	}
-
-	public static function update(BaseCommand $command) : void{
-		if (!$command->isRegistered()) {
-			return;
-		}
-		$name = $command->getName();
-		foreach(Server::getInstance()->getOnlinePlayers() as $player){
-			$id = spl_object_id($player);
-			if (isset(self::$playerdata[$id])) {
-				$commandData = self::$playerdata[$id];
-				$commandData[$name]->overloads = $command->encode($player);
-				$pk = AvailableCommandsPacket::create($commandData, [], [], []);
-				self::$filter[spl_object_id($pk)] = true;
-				$player->getNetworkSession()->sendDataPacket($pk);
-				self::$playerdata[$id] = $pk->commandData;
-			} else {
-				$player->getNetworkSession()->syncAvailableCommands();
-			}
-		}
 	}
 
 }
