@@ -50,7 +50,7 @@ final class Parameter{
 		$type = $this->type;
 		$name = $this->name;
 		if($type instanceof Enum){
-			if(!EnumManager::isRegister($type->getName())){
+			if(!EnumManager::isRegister($type)){
 				new \LogicException('Tried creating menu before calling ' . EnumManager::class . ' register');
 			}
 			return CommandParameter::enum($this->name, $type->encode(), $this->flag, $this->optional);

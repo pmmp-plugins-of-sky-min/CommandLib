@@ -26,47 +26,59 @@ declare(strict_types = 1);
 namespace skymin\CommandLib\enum;
 
 use pocketmine\network\mcpe\protocol\types\command\CommandEnum;
+use pocketmine\utils\Utils;
+
+use Closure;
 
 use function array_values;
 
 final class Enum{
 
-	public const TYPE_SOFT = 0;
-	public const TYPE_HARDCODE = 1;
-
 	/** @var string[] */
 	private array $values;
 
-	private bool $registerCheck = false;
+	private ?Closure $updater = null;
 
 	/** @param string[] $values */
 	public function __construct(
 		private string $name,
-		array $values,
-		private int $type = self::TYPE_SOFT
+		array|Closure $values
 	){
+		if($values instanceof Closure){
+			Utils::validateCallableSignature(function() : array{}, $values);
+			$this->updater = $values;
+			$values = $values();
+		}
 		$this->values = array_values($values);
 	}
 
-	public function getType() : int{
-		return $this->type;
+	public function isSoft() : bool{
+		return $this->updater !== null;
 	}
 
-	public function getName() : void{
+	public function getName() : string{
 		return $this->name;
 	}
 
 	public function getValues() : array{
-		return $this->values
+		return $this->values;
 	}
 
-	public function setValues(array $values) : void{
-		$this->values = $values;
+	public function update() : void{
+		$name = $this->name;
+		if(!EnumManager::isRegister($this)){
+			throw new \LogicException($name . 'is unregistered enum');
+		}
+		if(!$this->isSoft()){
+			throw new \InvalidArgumentException($name . 'is not softEnum');
+		}
+		$this->values = array_values(($this->updater)());
+		EnumManager::updateSoftEnum($this);
 	}
 
+	/** @internal */
 	public function encode() : CommandEnum{
 		return new CommandEnum($this->name, $this->values);
 	}
-
 
 }

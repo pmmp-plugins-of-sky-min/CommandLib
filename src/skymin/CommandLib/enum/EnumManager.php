@@ -25,11 +25,11 @@ declare(strict_types = 1);
 
 namespace skymin\CommandLib\enum;
 
-use LogicException;
-use InvalidArgumentException;
-
 use pocketmine\Server;
 use pocketmine\network\mcpe\protocol\UpdateSoftEnumPacket;
+
+use LogicException;
+use InvalidArgumentException;
 
 final class EnumManager{
 
@@ -39,7 +39,7 @@ final class EnumManager{
 	 */
 	private static array $enums = [];
 
-		/**
+	/**
 	 * @var Enum[]
 	 * @phpstan-var array<string, Enum>
 	 */
@@ -56,11 +56,16 @@ final class EnumManager{
 		}
 	}
 
-	public static function isRegister(string $enumName) : bool{
-		return isset(self::$enums[$enumName]);
+	public static function isRegister(Enum $enum) : bool{
+		$name = $enum->getName();
+		if(isset(self::$enums[$name])){
+			$renum = self::$enums[$name];
+			return $renum === $enum;
+		}
+		return false;
 	}
 
-	public function getEnum(string $name) : Enum{
+	public static function getEnum(string $name) : Enum{
 		if(isset(self::$enums[$name])){
 			return self::$enums[$name];
 		}
@@ -71,19 +76,20 @@ final class EnumManager{
 		return self::$softEnums;
 	}
 
-	public static function updateEnum(string $enumName) : void{
-		if(!self::isRegister($enumName)){
-			throw new LogicException($enumName . 'is unregistered enum');
-		}
-		$enum = self::$enums[$enumName];
+	/** @internal */
+	public static function updateSoftEnum(Enum $enum){
+		$name = $enum->getName();
 		if(!$enum->isSoft()){
-			throw new InvalidArgumentException($enumName . 'is not softEnum');
+			throw new \InvalidArgumentException($name . 'is not softEnum');
+		}
+		if(!self::isRegister($enum)){
+			throw new LogicException($name . 'is unregistered enum');
 		}
 		self::$softEnums[$name] = $enum->encode();
 		$server = Server::getInstance();
 		$server->broadcastPackets(
 			$server->getOnlinePlayers(),
-			UpdateSoftEnumPacket::create($enumName, $enum->getValues(), UpdateSoftEnumPacket::TYPE_SET);
+			[UpdateSoftEnumPacket::create($name, $enum->getValues(), UpdateSoftEnumPacket::TYPE_SET)]
 		);
 	}
 

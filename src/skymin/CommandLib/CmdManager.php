@@ -61,10 +61,11 @@ final class CmdManager{
 			if(count($targets) !== 1){
 				return;
 			}
+			$target = reset($targets);
 			foreach ($packet->commandData as $name => $commandData) {
 				$cmd = $commandMap->getCommand($name);
 				if($cmd instanceof BaseCommand && $cmd->hasOverloads()){
-					$commandData->overloads = $cmd->encode($player);
+					$commandData->overloads = $cmd->encode($target->getPlayer());
 				}
 			}
 			$packet->softEnums = EnumManager::getSoftEnums();
